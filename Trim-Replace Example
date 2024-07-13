@@ -1,0 +1,6 @@
+eventtype=<YOUR EVENT TYPE>
+[| inputlookup <yourfile.csv>
+| eval DOMAIN-IP = ltrim(replace(<FIELD NAME>,"http://", ""))
+| eval DOMAIN-IP = ltrim(replace(<FIELD NAME>,"https://", ""))
+| rex mode = sed field=DOMAIN-IP "s/:[0-9]{1,4}/ /g"
+| fields DOMAIN-IP]
