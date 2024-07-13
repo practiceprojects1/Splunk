@@ -1,0 +1,11 @@
+EventCode=4104 AND (ScriptBlockText="*Invoke-WebRequest*" OR Message="*Invoke-WebRequest*")
+| rex field=ScriptBlockText "(?<IPaddress1>[^\D]([0-9]{1,3}\.){3}([0-9]{1,3})[^\D])"
+| rex field=ScriptBlockText "(?<URL1>[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&=]*))"
+| rex field=Message "(?<IPaddress2>[^\D]([0-9]{1,3}\.){3}([0-9]{1,3})[^\D])"
+| rex field=Message "(?<URL2>[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&=]*))"
+| eval IP=coalesce(IPaddress1, IPaddress2)
+| eval URL=coalesce(URL1, URL2)
+| eval Message=coalesce(ScriptBlockText, Message)
+| search NOT IP IN ("192.168.*") NOT URL IN ("*google.com*") 
+| stats values(Message) AS Message values(IPaddress) AS IP values(URL) AS URL count BY Path 
+| table Message Path IP URL count
