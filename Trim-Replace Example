@@ -1,3 +1,5 @@
+#Removes http/s and port number from url containing an IP address
+
 eventtype=<YOUR EVENT TYPE>
 [| inputlookup <yourfile.csv>
 | eval DOMAIN-IP = ltrim(replace(<FIELD NAME>,"http://", ""))
