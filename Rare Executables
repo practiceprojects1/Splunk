@@ -1,0 +1,11 @@
+| tstats count values(Processes.dest) as dest values(Processes.user) as user values(Processes.process_hash) AS process_hash min(_time) as firstTime max(_time) as lastTime from datamodel=Endpoint.Processes by Processes.process_name 
+| eval MarkerTime=relative_time(now(), "-1d@d" )
+| where firstTime>=MarkerTime
+| rename Processes.process_name as process 
+| search process!="*.tmp"
+| where count < 5
+| sort count 
+| `security_content_ctime(firstTime)` 
+| `security_content_ctime(lastTime)` 
+| `security_content_ctime(MarkerTime)`
+| `detect_rare_executables_filter`
